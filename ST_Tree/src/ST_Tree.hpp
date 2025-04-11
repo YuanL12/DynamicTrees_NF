@@ -93,7 +93,7 @@ class ST_Tree
         ST_Tree(bool optim, int n, int debug);
         
          // Create tree of n unconnected nodes (named 1 to n)
-        // ~ST_Tree(); // To implement
+        ~ST_Tree(); // To implement
 
 
         // Dynamic Tree Operations

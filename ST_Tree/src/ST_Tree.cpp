@@ -36,6 +36,68 @@ ST_Tree::ST_Tree(bool optim, int n, int debug) // Create tree of n unconnected n
     representation_number = 0;
 }
 
+// destructor
+ST_Tree::~ST_Tree()
+{
+    // First, collect all internal nodes to delete
+    std::vector<ST_Node*> internal_nodes;
+    
+    // Get all unique paths
+    std::vector<ST_Node*> paths = getAllUniquePaths();
+    
+    // For each path, collect all internal nodes
+    for (ST_Node* p : paths)
+    {
+        std::queue<ST_Node*> bfs;
+        bfs.push(p);
+        while (!bfs.empty())
+        {
+            ST_Node* current = bfs.front();
+            bfs.pop();
+            
+            if (!current->external)
+            {
+                internal_nodes.push_back(current);
+                
+                // Add children to queue if they're not external
+                if (!current->bleft->external)
+                    bfs.push(current->bleft);
+                if (!current->bright->external)
+                    bfs.push(current->bright);
+            }
+        }
+    }
+    
+    // Delete all internal nodes
+    for (ST_Node* node : internal_nodes)
+    {
+        // Set pointers to nullptr to avoid dangling pointers
+        node->bparent = nullptr;
+        node->bleft = nullptr;
+        node->bright = nullptr;
+        node->bhead = nullptr;
+        node->btail = nullptr;
+        delete node;
+    }
+    
+    // Delete all external nodes (vertices)
+    for (auto& pair : vertices)
+    {
+        // Set pointers to nullptr to avoid dangling pointers
+        pair.second->bparent = nullptr;
+        pair.second->bleft = nullptr;
+        pair.second->bright = nullptr;
+        pair.second->bhead = nullptr;
+        pair.second->btail = nullptr;
+        delete pair.second;
+    }
+    
+    // Clear maps
+    vertices.clear();
+    dparent.clear();
+    dcost.clear();
+}
+
 // Elemntary Path operations
 // Static Operations
 ST_Node* ST_Tree::path(int v) // Return the node representing the path v belongs to
